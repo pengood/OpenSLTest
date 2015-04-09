@@ -1,0 +1,11 @@
+#define LOG_TAG "OpenSLActivity"
+#define DGB 1
+
+#include "log.h"
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+#include <stdio.h>
+#include <assert.h>
+#include <pthread.h>
+
+#include "com_pzhao_opensltest_MainActivity.h"
