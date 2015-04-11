@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_pzhao_opensltest_MainActivity
  * Method:    createEngine
- * Signature: (Ljava/lang/String;)V
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_pzhao_opensltest_MainActivity

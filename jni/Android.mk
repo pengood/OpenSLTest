@@ -4,7 +4,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := OpenSLTest
-LOCAL_SRC_FILES := com_pzhao_opensltest_MainActivity.cpp
+LOCAL_SRC_FILES := com_pzhao_opensltest_MainActivity.cpp CycleBuffer.cpp thread.cpp RingBuffer.cpp
 
 # for native audio
 LOCAL_LDLIBS    += -lOpenSLES

@@ -7,6 +7,7 @@
 
 #ifndef CYCLEBUFFER_H_
 #define CYCLEBUFFER_H_
+#include<pthread.h>
 class CycleBuffer {
 public:
 

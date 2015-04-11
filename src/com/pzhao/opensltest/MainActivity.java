@@ -29,7 +29,7 @@ public class MainActivity extends Activity implements OnClickListener {
         mute=(Button)findViewById(R.id.mute);
         unmute=(Button)findViewById(R.id.unmute);
         stop=(Button)findViewById(R.id.stop);
-        createEngine();
+        createEngine(URI_PCM);
         
         uri_start.setOnClickListener(this);
         pause.setOnClickListener(this);
@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements OnClickListener {
     } 
     
     /** Native methods, implemented in jni folder */  
-    public static native void createEngine();  
+    public static native void createEngine(String uri);  
   
     public static native boolean createAudioPlayer(String uri);  
     

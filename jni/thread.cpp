@@ -16,9 +16,9 @@ Thread::~Thread() {
 	if (m_running == 1 && m_detached == 0) {
 		pthread_detach(m_tid);
 	}
-	if (m_running == 1) {
-		pthread_cancel(m_tid);
-	}
+//	if (m_running == 1) {
+//		pthread_cancel(m_tid);
+//	}
 }
 int Thread::start() {
 	int result = pthread_create(&m_tid, NULL, runThread, this);

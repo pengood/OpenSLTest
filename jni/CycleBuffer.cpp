@@ -10,7 +10,6 @@
 #include <memory.h>
 #include<sys/time.h>
 #include<sched.h>
-#include "log.h"
 #include "thread.h"
 #include"CycleBuffer.h"
 CycleBuffer::CycleBuffer(int size) {
@@ -33,7 +32,6 @@ CycleBuffer::~CycleBuffer() {
 int CycleBuffer::write(char* buf, int count) {
 	pthread_mutex_lock(&mutex);
 	if (avaibleToWrite() < count) {
-		ALOGD("can't write data");
 		pthread_cond_signal(&cond_read);
 		pthread_cond_wait(&cond_write, &mutex);
 	}
@@ -52,7 +50,12 @@ int CycleBuffer::write(char* buf, int count) {
 		memcpy(Buf + WritePos, buf, count);
 		WritePos += count;
 	}
+
 	pthread_mutex_unlock(&mutex);
+//	struct timeval delay;
+//	delay.tv_sec = 0;
+//	delay.tv_usec = 1000; // 1 ms
+//	select(0, NULL, NULL, NULL, &delay);
 	return count;
 }
 
@@ -60,7 +63,6 @@ int CycleBuffer::read(char *buf, int count) {
 	pthread_mutex_lock(&mutex);
 	int result;
 	if (avaibleToRead() <= 0) {
-		ALOGD("can't read data");
 		pthread_cond_signal(&cond_write);
 		pthread_cond_wait(&cond_read, &mutex);
 	}
@@ -100,12 +102,16 @@ int CycleBuffer::read(char *buf, int count) {
 		}
 	}
 	pthread_mutex_unlock(&mutex);
+//	struct timeval delay;
+//	delay.tv_sec = 0;
+//	delay.tv_usec = 1000; // 1 ms
+//	select(0, NULL, NULL, NULL, &delay);
 	return result;
 }
 
 void CycleBuffer::setEmpty() {
 	pthread_mutex_lock(&mutex);
-	ALOGD("clear buffer");
+	printf("clear buffer");
 	memset(Buf,0,BufSize);
 	ReadPos = WritePos = 0;
 	pthread_mutex_unlock(&mutex);
