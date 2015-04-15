@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import java.nio.ByteBuffer;
+
 public class MainActivity extends Activity implements OnClickListener {
     private Button start;
     private Button uri_start;
@@ -14,6 +16,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button mute;
     private Button unmute; 
     private Button stop;
+    public ByteBuffer buffer;
+    public WriteThread thread;
     private static String URI_PCM = "/storage/emulated/0/DCIM/ye.wav";  
     static {
         System.loadLibrary("OpenSLTest");
@@ -29,7 +33,11 @@ public class MainActivity extends Activity implements OnClickListener {
         mute=(Button)findViewById(R.id.mute);
         unmute=(Button)findViewById(R.id.unmute);
         stop=(Button)findViewById(R.id.stop);
+        buffer=ByteBuffer.allocateDirect(8192);
+        thread=new WriteThread(this);
+        
         createEngine(URI_PCM);
+        setNativeBuffer(buffer);
         
         uri_start.setOnClickListener(this);
         pause.setOnClickListener(this);
@@ -51,6 +59,7 @@ public class MainActivity extends Activity implements OnClickListener {
         // TODO Auto-generated method stub
         switch(arg0.getId()){
             case R.id.uri_start:
+                thread.start();
                 createUriAudioPlayer(URI_PCM);
           //      setPlayingUriAudioPlayer(true);
                 break;
@@ -72,11 +81,18 @@ public class MainActivity extends Activity implements OnClickListener {
     
     protected void onDestroy() {  
         super.onDestroy();  
+        thread.isRuning=false;
         shutdown();  
     } 
     
     /** Native methods, implemented in jni folder */  
-    public static native void createEngine(String uri);  
+    public static native void createEngine(String uri); 
+    
+    public static native void setNativeBuffer(ByteBuffer buffer);
+    
+    public static native boolean checkWrite();
+    
+    public static native void write();
   
     public static native boolean createAudioPlayer(String uri);  
     

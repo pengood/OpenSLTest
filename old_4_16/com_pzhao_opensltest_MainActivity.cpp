@@ -1,4 +1,4 @@
-#define LOG_TAG "OpenSLTest"
+#define LOG_TAG "OpenSLActivity"
 #define DGB 1
 
 #include "log.h"
@@ -40,10 +40,6 @@ bool firstFlag = false;
 static bool isPlay = true;
 RingBuffer *mRBuffer;
 
-void* buffer;
-long bufferSize;
-bool writeFalg;
-
 static PlaybackThread* mThread;
 WriteThread *thread1;
 
@@ -51,13 +47,12 @@ void *play(void *arg) {
 	void* mbuffer = malloc(8192);
 	int msize = 0, wsize, hasws;
 	while (isPlay) {
-		if (mRBuffer->getWriteSpace() < 8192) {
+		if (mRBuffer->getWriteSpace()<8192) {
 			if (firstFlag && mRBuffer->getReadSpace() >= 8192 * 2) {
 				firstFlag = false;
 				nextSize = mRBuffer->Read(nextBuffer, 8192);
 				if (nextSize > 0) {
-					ALOGD(
-							"pzhao-->I'm in new playcallback nextsize=%d and rsize=%d",
+					ALOGD("pzhao-->I'm in new playcallback nextsize=%d and rsize=%d",
 							nextSize, mRBuffer->getReadSpace());
 					SLresult result;
 					result = (*bqPlayerBufferQueue)->Enqueue(
@@ -78,8 +73,7 @@ void *play(void *arg) {
 		msize = fread(mbuffer, 1, 8192, fp);
 		if (msize > 0) {
 			hasws = mRBuffer->Write((char*) mbuffer, msize);
-			ALOGD("pzhao-->play function freadsize=%d writePtr=%d wsize=%d",
-					msize, mRBuffer->get_writePtr(), hasws);
+			ALOGD("pzhao-->play function freadsize=%d writePtr=%d wsize=%d", msize,mRBuffer->get_writePtr(),hasws);
 		} else
 			ALOGD("pzhao-->I'm in play function msize<0");
 		long sleepNs = 1000000; //1ms
@@ -206,54 +200,14 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine
 
 	//add thread
 	mRBuffer = new RingBuffer(1024*1024);
-//	fp = fopen((char*) utf8Uri_new, "r");
-//		if (fp == NULL) {
-//			ALOGD("open file error %s", utf8Uri_new);
-////	return JNI_FALSE;
-//}
-//pthread_t pt;
-//pthread_create(&pt, NULL, play, NULL);
-	nextBuffer = (char *) malloc(8192);
+	fp = fopen((char*) utf8Uri_new, "r");
+		if (fp == NULL) {
+			ALOGD("open file error %s", utf8Uri_new);
+//	return JNI_FALSE;
 }
-
-/*
- * Class:     com_pzhao_opensltest_MainActivity
- * Method:    setNativeBuffer
- * Signature: (Ljava/nio/ByteBuffer;)V
- */
-JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setNativeBuffer
-(JNIEnv *env, jclass clazz, jobject jbuffer) {
-	buffer = env->GetDirectBufferAddress(jbuffer);
-	jlong length = env->GetDirectBufferCapacity(jbuffer);
-	bufferSize=length;
-
-}
-
-JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_checkWrite(
-		JNIEnv *env, jclass clazz) {
-	return mRBuffer->getWriteSpace() >= 8192;
-}
-
-/*
- * Class:     com_pzhao_opensltest_MainActivity
- * Method:    write
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_write
-(JNIEnv *env, jclass clazz) {
-int hasws=mRBuffer->Write((char*) buffer, bufferSize);
-	ALOGD("pzhao-->write function writePtr=%d hasWritesize=%d",mRBuffer->get_writePtr(), hasws);
-	if (firstFlag && mRBuffer->getReadSpace() >= 8192 * 2) {
-		firstFlag = false;
-		nextSize = mRBuffer->Read(nextBuffer, 8192);
-		if (nextSize > 0) {
-			SLresult result;
-			result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, nextSize);
-			if (SL_RESULT_SUCCESS != result) {
-									ALOGD("pzhao-->I'm in write unsuccess result");
-										}
-						}
-				}
+pthread_t pt;
+pthread_create(&pt, NULL, play, NULL);
+nextBuffer = (char *) malloc(8192);
 }
 /*
  * Class:     com_pzhao_opensltest_MainActivity
@@ -267,23 +221,23 @@ const char* utf8Uri = env->GetStringUTFChars(uri, NULL);
 SLresult result;
  // configure audio source
 SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
-SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 3 };
+	SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 3 };
 SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
-SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16, SL_SPEAKER_FRONT_LEFT
-| SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
+	SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+	SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
 SLDataSource audioSrc = { &loc_bufq, &format_pcm };
 
  // configure audio sink
 SLDataLocator_OutputMix loc_outmix =
-{ SL_DATALOCATOR_OUTPUTMIX, outputMixObject };
+	{ SL_DATALOCATOR_OUTPUTMIX, outputMixObject };
 SLDataSink audioSnk = { &loc_outmix, NULL };
 
  // create audio player
 const SLInterfaceID ids[3] = { SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND,
-SL_IID_VOLUME };
+	SL_IID_VOLUME };
 const SLboolean req[3] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject,
-&audioSrc, &audioSnk, 3, ids, req);
+	&audioSrc, &audioSnk, 3, ids, req);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
@@ -294,32 +248,32 @@ assert(SL_RESULT_SUCCESS == result);
 
  // get the play interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY,
-&bqPlayerPlay);
+	&bqPlayerPlay);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
  // get the buffer queue interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
-&bqPlayerBufferQueue);
+	&bqPlayerBufferQueue);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
 mThread = new PlaybackThread(utf8Uri);
  // register callback on the buffer queue
 result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue,
-PlaybackThread::playerCallback, mThread);
+	PlaybackThread::playerCallback, mThread);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
  // get the effect send interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
-&bqPlayerEffectSend);
+	&bqPlayerEffectSend);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
  // get the volume interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME,
-&bqPlayerVolume);
+	&bqPlayerVolume);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
@@ -345,18 +299,18 @@ assert(bq == bqPlayerBufferQueue);
 assert(NULL == context);
  //nextSize = thread1->mCBuffer->read(nextBuffer, 480);
 //	nextSize = fread(nextBuffer, 1, 480, fp);
-while (mRBuffer->getReadSpace() < 8192 * 2)
+while (mRBuffer->getReadSpace() < 8192*2)
 ;
 nextSize = mRBuffer->Read(nextBuffer, 8192);
 if (nextSize > 0) {
 ALOGD("pzhao-->playcallback nextsize=%d and rsize=%d readPtr=%d", nextSize,
-mRBuffer->getReadSpace(), mRBuffer->get_readPtr());
+		mRBuffer->getReadSpace(),mRBuffer->get_readPtr());
 SLresult result;
 result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
-nextSize);
+		nextSize);
 if (SL_RESULT_SUCCESS != result) {
-ALOGD("pzhao-->I'm in new playcallback unsuccess result");
-return;
+	ALOGD("pzhao-->I'm in new playcallback unsuccess result");
+	return;
 }
 }
 }
@@ -373,23 +327,23 @@ const char* utf8Uri = env->GetStringUTFChars(uri, NULL);
 SLresult result;
  // configure audio source
 SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
-SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 3 };
+	SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 3 };
 SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
-SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16, SL_SPEAKER_FRONT_LEFT
-| SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
+	SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+	SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT, SL_BYTEORDER_LITTLEENDIAN };
 SLDataSource audioSrc = { &loc_bufq, &format_pcm };
 
  // configure audio sink
 SLDataLocator_OutputMix loc_outmix =
-{ SL_DATALOCATOR_OUTPUTMIX, outputMixObject };
+	{ SL_DATALOCATOR_OUTPUTMIX, outputMixObject };
 SLDataSink audioSnk = { &loc_outmix, NULL };
 
  // create audio player
 const SLInterfaceID ids[3] = { SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND,
-SL_IID_VOLUME };
+	SL_IID_VOLUME };
 const SLboolean req[3] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject,
-&audioSrc, &audioSnk, 3, ids, req);
+	&audioSrc, &audioSnk, 3, ids, req);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
@@ -400,32 +354,32 @@ assert(SL_RESULT_SUCCESS == result);
 
  // get the play interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY,
-&bqPlayerPlay);
+	&bqPlayerPlay);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
  // get the buffer queue interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,
-&bqPlayerBufferQueue);
+	&bqPlayerBufferQueue);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
 //	mThread = new PlaybackThread(utf8Uri);
 // register callback on the buffer queue
 result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue,
-bpPlayerCallback, NULL);
+	bpPlayerCallback, NULL);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
  // get the effect send interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
-&bqPlayerEffectSend);
+	&bqPlayerEffectSend);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 
  // get the volume interface
 result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME,
-&bqPlayerVolume);
+	&bqPlayerVolume);
 assert(SL_RESULT_SUCCESS == result);
 (void) result;
 

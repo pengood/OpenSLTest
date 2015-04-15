@@ -17,30 +17,6 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine
 
 /*
  * Class:     com_pzhao_opensltest_MainActivity
- * Method:    setNativeBuffer
- * Signature: (Ljava/nio/ByteBuffer;)V
- */
-JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setNativeBuffer
-  (JNIEnv *, jclass, jobject);
-
-/*
- * Class:     com_pzhao_opensltest_MainActivity
- * Method:    checkWrite
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_checkWrite
-  (JNIEnv *, jclass);
-
-/*
- * Class:     com_pzhao_opensltest_MainActivity
- * Method:    write
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_write
-  (JNIEnv *, jclass);
-
-/*
- * Class:     com_pzhao_opensltest_MainActivity
  * Method:    createAudioPlayer
  * Signature: (Ljava/lang/String;)Z
  */
