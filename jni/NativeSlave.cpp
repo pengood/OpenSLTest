@@ -4,21 +4,36 @@
 #include "log.h"
 
 NativeSlave::NativeSlave(size_t size) {
-	mBuffer=new RingBuffer(size);
+	mBuffer = new RingBuffer(size);
 	nextBuffer = (char*) malloc(8192);
 	ALOGD("pzhao-->NativeSlave created");
 }
 
 NativeSlave::~NativeSlave() {
-	if (mBuffer != NULL)
-		delete mBuffer;
-	if (nextBuffer != NULL)
-		free(nextBuffer);
+	if (bqPlayerObject != NULL) {
+		(*bqPlayerObject)->Destroy(bqPlayerObject);
+		bqPlayerPlay = NULL;
+		bqPlayerBufferQueue = NULL;
+		bqPlayerEffectSend = NULL;
+		bqPlayerVolume = NULL;
+	}
+
+	// destroy output mix object, and invalidate all associated interfaces
+	if (outputMixObject != NULL) {
+		(*outputMixObject)->Destroy(outputMixObject);
+		outputMixObject = NULL;
+	}
 	if (engineObject != NULL) {
 		(*engineObject)->Destroy(engineObject);
 		engineObject = NULL;
 		engineEngine = NULL;
 	}
+
+	if (mBuffer != NULL)
+		delete mBuffer;
+	if (nextBuffer != NULL)
+		free(nextBuffer);
+
 	ALOGD("pzhao-->delete NativeSlave");
 }
 void NativeSlave::createEngine() {
@@ -52,9 +67,9 @@ void NativeSlave::createEngine() {
 	ALOGD("pzhao-->create engine");
 }
 
-void NativeSlave::enqueueBuffer(){
-	ALOGD("pzhao-->enqueueBuffer begin");
-	while (mBuffer->getReadSpace() < 8192 * 2);
+void NativeSlave::enqueueBuffer() {
+	while (mBuffer->getReadSpace() < 8192 * 2)
+		;
 	int nextSize = mBuffer->Read(nextBuffer, 8192);
 	if (nextSize > 0) {
 		SLresult result;
@@ -63,7 +78,6 @@ void NativeSlave::enqueueBuffer(){
 		assert(SL_RESULT_SUCCESS == result);
 		(void) result;
 	}
-	ALOGD("pzhao-->enqueueBuffer last");
 }
 
 //static void NativeSlave::playCallBack(SLAndroidSimpleBufferQueueItf bq,
@@ -79,11 +93,11 @@ bool NativeSlave::createAudioPlayer(NativeSlave *mSlave) {
 	SLresult result;
 	// configure audio source
 	SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
-			SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 3 };
+	SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 3 };
 	SLDataFormat_PCM format_pcm = { SL_DATAFORMAT_PCM, 2, SL_SAMPLINGRATE_44_1,
-			SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
-			SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
-			SL_BYTEORDER_LITTLEENDIAN };
+	SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
+	SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT,
+	SL_BYTEORDER_LITTLEENDIAN };
 	SLDataSource audioSrc = { &loc_bufq, &format_pcm };
 
 	// configure audio sink

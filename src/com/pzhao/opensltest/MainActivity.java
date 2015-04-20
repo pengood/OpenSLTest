@@ -50,7 +50,6 @@ public class MainActivity extends Activity implements OnClickListener {
             case R.id.uri_start:
                 createAudioPlayer();
                 thread.start();
-          //      setPlayingUriAudioPlayer(true);
                 break;
             case R.id.pause:
                 setPlayingUriAudioPlayer(false);
@@ -62,7 +61,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 setMuteUriAudioPlayer(false);
                 break;
             case R.id.stop:
-                shutdown();  
+                thread.isRuning=false;
                 break;
         }
         
@@ -71,7 +70,6 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onDestroy() {  
         super.onDestroy();  
         thread.isRuning=false;
-        shutdown();  
     } 
     
     /** Native methods, implemented in jni folder */  

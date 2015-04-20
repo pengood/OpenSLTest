@@ -35,6 +35,7 @@ public void run(){
     }
     try {
         bis.close();
+        MainActivity.shutdown();
     } catch (IOException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

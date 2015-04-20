@@ -15,6 +15,7 @@
 					mRingBufferPtr = ringbuffer_create(mLength);
 				}
 	RingBuffer::~RingBuffer(){
+	ALOGD("pzhao-->delete RingBuffer");
 					if(mRingBufferPtr != NULL)
 						ringbuffer_free(mRingBufferPtr);
 				}
@@ -31,7 +32,7 @@
 				}
 
 	size_t RingBuffer::Read( char *dest, size_t cnt){
-		ALOGD("pzhao-->read RingBuffer");
+	//	ALOGD("pzhao-->read RingBuffer");
 		return ringbuffer_read (mRingBufferPtr , dest, cnt);
 	}
 
