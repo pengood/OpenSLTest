@@ -15,6 +15,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private Button mute;
     private Button unmute; 
     private Button stop;
+    private boolean isPause=true;
     public ByteBuffer buffer;
     public WriteThread thread;
     private static String URI_PCM = "/storage/emulated/0/DCIM/ye.wav";  
@@ -52,7 +53,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 thread.start();
                 break;
             case R.id.pause:
-                setPlayingUriAudioPlayer(false);
+                isPause=!isPause;
+                setPlayingUriAudioPlayer(isPause);
                 break;
             case R.id.mute:
                 setMuteUriAudioPlayer(true);
