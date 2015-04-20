@@ -10,9 +10,17 @@ extern "C" {
 /*
  * Class:     com_pzhao_opensltest_MainActivity
  * Method:    createEngine
- * Signature: (Ljava/nio/ByteBuffer;)V
+ * Signature: (Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     com_pzhao_opensltest_MainActivity
+ * Method:    setNativeBuffer
+ * Signature: (Ljava/nio/ByteBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setNativeBuffer
   (JNIEnv *, jclass, jobject);
 
 /*
@@ -34,10 +42,18 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_write
 /*
  * Class:     com_pzhao_opensltest_MainActivity
  * Method:    createAudioPlayer
- * Signature: ()Z
+ * Signature: (Ljava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_createAudioPlayer
-  (JNIEnv *, jclass);
+  (JNIEnv *, jclass, jstring);
+
+/*
+ * Class:     com_pzhao_opensltest_MainActivity
+ * Method:    createUriAudioPlayer
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_createUriAudioPlayer
+  (JNIEnv *, jclass, jstring);
 
 /*
  * Class:     com_pzhao_opensltest_MainActivity

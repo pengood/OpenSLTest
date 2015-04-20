@@ -26,7 +26,7 @@ public void run(){
         if(MainActivity.checkWrite()){
             try {
                 bis.read(mActivity.buffer.array());
-                MainActivity.write();
+               MainActivity.write();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

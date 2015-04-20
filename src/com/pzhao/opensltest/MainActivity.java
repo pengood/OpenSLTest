@@ -11,7 +11,6 @@ import java.nio.ByteBuffer;
 
 public class MainActivity extends Activity implements OnClickListener {
     private Button start;
-    private Button uri_start;
     private Button pause;
     private Button mute;
     private Button unmute; 
@@ -27,8 +26,7 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        start=(Button)findViewById(R.id.button1);
-        uri_start=(Button)findViewById(R.id.uri_start);
+        start=(Button)findViewById(R.id.uri_start);
         pause=(Button)findViewById(R.id.pause);
         mute=(Button)findViewById(R.id.mute);
         unmute=(Button)findViewById(R.id.unmute);
@@ -36,22 +34,13 @@ public class MainActivity extends Activity implements OnClickListener {
         buffer=ByteBuffer.allocateDirect(8192);
         thread=new WriteThread(this);
         
-        createEngine(URI_PCM);
-        setNativeBuffer(buffer);
+        createEngine(buffer);
         
-        uri_start.setOnClickListener(this);
+        start.setOnClickListener(this);
         pause.setOnClickListener(this);
         mute.setOnClickListener(this);
         unmute.setOnClickListener(this);
         stop.setOnClickListener(this);
-        start.setOnClickListener(new View.OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                // TODO Auto-generated method stub
-                createAudioPlayer(URI_PCM);
-            }
-        });
 
     }
     @Override
@@ -59,8 +48,8 @@ public class MainActivity extends Activity implements OnClickListener {
         // TODO Auto-generated method stub
         switch(arg0.getId()){
             case R.id.uri_start:
+                createAudioPlayer();
                 thread.start();
-                createUriAudioPlayer(URI_PCM);
           //      setPlayingUriAudioPlayer(true);
                 break;
             case R.id.pause:
@@ -86,17 +75,13 @@ public class MainActivity extends Activity implements OnClickListener {
     } 
     
     /** Native methods, implemented in jni folder */  
-    public static native void createEngine(String uri); 
-    
-    public static native void setNativeBuffer(ByteBuffer buffer);
+    public static native void createEngine(ByteBuffer buffer); 
     
     public static native boolean checkWrite();
     
     public static native void write();
   
-    public static native boolean createAudioPlayer(String uri);  
-    
-    public static native boolean createUriAudioPlayer(String uri);
+    public static native boolean createAudioPlayer();
 
     public static native void setPlayingUriAudioPlayer(boolean isPlaying);
 

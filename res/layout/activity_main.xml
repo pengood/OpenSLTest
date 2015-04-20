@@ -3,17 +3,12 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start" />
 
     <Button
         android:id="@+id/uri_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/uri_start" />
+        android:text="@string/start" />
 
     <Button
         android:id="@+id/pause"

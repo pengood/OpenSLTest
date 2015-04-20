@@ -4,6 +4,8 @@
  *  Created on: 2015年4月10日
  *      Author: zhao
  */
+#define LOG_TAG "OpenSLActivity"
+#define DGB 1
 #include"RingBuffer.h"
 #include "log.h"
 
@@ -34,7 +36,7 @@
 	}
 
 	size_t RingBuffer::Write(char *src,size_t cnt){
-		ALOGD("pzhao-->write RingBuffer");
+	//	ALOGD("pzhao-->write RingBuffer");
 		return ringbuffer_write (mRingBufferPtr, src, cnt);
 	}
 
