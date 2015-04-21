@@ -32,7 +32,7 @@ public class MainActivity extends Activity implements OnClickListener {
         mute=(Button)findViewById(R.id.mute);
         unmute=(Button)findViewById(R.id.unmute);
         stop=(Button)findViewById(R.id.stop);
-        buffer=ByteBuffer.allocateDirect(8192);
+        buffer=ByteBuffer.allocateDirect(480);
         thread=new WriteThread(this);
         
         createEngine(buffer);

@@ -7,7 +7,6 @@
 
 void* buffer;
 long bufferSize;
-
 bool firstFlag;
 NativeSlave *mSlave;
 
