@@ -49,12 +49,6 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setJniEnv(
 		JNIEnv *env, jobject obj) {
 	env->GetJavaVM(&g_jvm);
 	g_obj = env->NewGlobalRef(obj);
-	pthread_t pt;
-	pthread_create(&pt, NULL, sendStartUdp, NULL);
-//	jclass cls=env->GetObjectClass(obj);
-//	jmethodID mid=env->GetMethodID(cls,"fromJni","(I)V");
-//	env->CallVoidMethod(obj,mid,3);
-
 }
 
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine(
@@ -74,6 +68,7 @@ JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_createAudioPla
 
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setPlayingUriAudioPlayer(
 		JNIEnv *env, jclass clazz, jboolean isPlaying) {
+	if(isPlaying)firstFlag=true;
 	mSlave->setPlayAudioPlayer(isPlaying);
 }
 
@@ -92,6 +87,8 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_write(JNIEnv *env,
 	int hasW = mSlave->mBuffer->Write((char*) buffer, bufferSize);
 	if (firstFlag && mSlave->mBuffer->getReadSpace() >= 8192 * 2) {
 		firstFlag = false;
+		pthread_t pt;
+		pthread_create(&pt, NULL, sendStartUdp, NULL);
 		mSlave->startPlay();
 	}
 }
@@ -100,4 +97,8 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_shutdown(
 		JNIEnv *env, jclass clazz) {
 	if (mSlave != NULL)
 		delete mSlave;
+	if(buffer!=NULL){
+		free(buffer);
+		buffer=NULL;
+	}
 }

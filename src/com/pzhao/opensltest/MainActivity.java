@@ -37,9 +37,11 @@ public class MainActivity extends Activity implements OnClickListener {
         thread=new WriteThread(this);
         
         createEngine(buffer);
+        createAudioPlayer();
         setJniEnv();
+        thread.start();
         
-        start.setOnClickListener(this);
+        start.setOnClickListener(this); 
         pause.setOnClickListener(this);
         mute.setOnClickListener(this);
         unmute.setOnClickListener(this);
@@ -51,12 +53,12 @@ public class MainActivity extends Activity implements OnClickListener {
         // TODO Auto-generated method stub
         switch(arg0.getId()){
             case R.id.uri_start:
-                createAudioPlayer();
-                thread.start();
+                thread.startFlag=true;
+                setPlayingUriAudioPlayer(true);
                 break;
             case R.id.pause:
-                isPause=!isPause;
-                setPlayingUriAudioPlayer(isPause);
+                setPlayingUriAudioPlayer(false);
+                thread.startFlag=false;
                 break;
             case R.id.mute:
                 setMuteUriAudioPlayer(true);

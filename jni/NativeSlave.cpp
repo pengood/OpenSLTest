@@ -80,6 +80,12 @@ void NativeSlave::enqueueBuffer() {
 	}
 }
 
+void NativeSlave::clearQueueBuffer(){
+	SLresult result;
+			result = (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
+			assert(SL_RESULT_SUCCESS == result);
+			(void) result;
+}
 //static void NativeSlave::playCallBack(SLAndroidSimpleBufferQueueItf bq,
 //		void *context) {
 //	assert(bq == bqPlayerBufferQueue);
@@ -173,6 +179,10 @@ void NativeSlave::setPlayAudioPlayer(bool isPlay) {
 		result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay,
 				isPlay ? SL_PLAYSTATE_PLAYING : SL_PLAYSTATE_PAUSED);
 		assert(SL_RESULT_SUCCESS == result);
+	}
+	if(!isPlay) {
+		clearQueueBuffer();
+		mBuffer->Reset();
 	}
 }
 

@@ -49,6 +49,7 @@
 		}
 	void RingBuffer::Reset(){
 		ringbuffer_reset (mRingBufferPtr);
+		ALOGD("pzhao-->reset RingBuffer");
 	}
 
 

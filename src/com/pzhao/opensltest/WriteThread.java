@@ -11,6 +11,7 @@ public class WriteThread extends Thread{
     public String URI_PCM = "/storage/emulated/0/DCIM/ye.wav";  
     public BufferedInputStream bis;
     public boolean isRuning=true;
+    public boolean startFlag=false;
 public WriteThread(MainActivity activity){
     mActivity=activity;
     try {
@@ -23,7 +24,7 @@ public WriteThread(MainActivity activity){
 
 public void run(){
     while(isRuning){
-        if(MainActivity.checkWrite()){
+        if(startFlag&&MainActivity.checkWrite()){
             try {
                 bis.read(mActivity.buffer.array());
                MainActivity.write();

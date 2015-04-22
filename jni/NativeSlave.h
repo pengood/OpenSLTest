@@ -42,6 +42,7 @@ public :
 	~NativeSlave();
 	void createEngine();
 	void enqueueBuffer();
+	void clearQueueBuffer();
 	static void playCallBack(SLAndroidSimpleBufferQueueItf bq,void *context){
 		assert(bq == bqPlayerBufferQueue);
 			assert(NULL != context);
