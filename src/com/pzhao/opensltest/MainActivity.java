@@ -3,6 +3,7 @@ package com.pzhao.opensltest;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -36,6 +37,7 @@ public class MainActivity extends Activity implements OnClickListener {
         thread=new WriteThread(this);
         
         createEngine(buffer);
+        setJniEnv();
         
         start.setOnClickListener(this);
         pause.setOnClickListener(this);
@@ -74,7 +76,13 @@ public class MainActivity extends Activity implements OnClickListener {
         thread.isRuning=false;
     } 
     
+    private void fromJni(int i){
+        Log.d("OpenSLTest", "from Jni "+i);
+    }
+    
     /** Native methods, implemented in jni folder */  
+    private native void setJniEnv();
+    
     public static native void createEngine(ByteBuffer buffer); 
     
     public static native boolean checkWrite();

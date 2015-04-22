@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     com_pzhao_opensltest_MainActivity
+ * Method:    setJniEnv
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setJniEnv
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_pzhao_opensltest_MainActivity
  * Method:    createEngine
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
