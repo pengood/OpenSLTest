@@ -2,6 +2,7 @@
 package com.pzhao.opensltest;
 
 import android.app.Activity;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +20,8 @@ public class MainActivity extends Activity implements OnClickListener {
     private boolean isPause=true;
     public ByteBuffer buffer;
     public WriteThread thread;
-    private static String URI_PCM = "/storage/emulated/0/DCIM/ye.wav";  
+    private static String URI_PCM = "/storage/emulated/0/DCIM/hou.wav";  
+    
     static {
         System.loadLibrary("OpenSLTest");
    }
@@ -61,7 +63,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 thread.startFlag=false;
                 break;
             case R.id.mute:
-                setMuteUriAudioPlayer(true);
+              setMuteUriAudioPlayer(true);
                 break;
             case R.id.unmute:
                 setMuteUriAudioPlayer(false);

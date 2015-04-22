@@ -16,6 +16,7 @@ NativeSlave::~NativeSlave() {
 		bqPlayerBufferQueue = NULL;
 		bqPlayerEffectSend = NULL;
 		bqPlayerVolume = NULL;
+		PlaybackRate = NULL;
 	}
 
 	// destroy output mix object, and invalidate all associated interfaces
@@ -80,20 +81,12 @@ void NativeSlave::enqueueBuffer() {
 	}
 }
 
-void NativeSlave::clearQueueBuffer(){
+void NativeSlave::clearQueueBuffer() {
 	SLresult result;
-			result = (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
-			assert(SL_RESULT_SUCCESS == result);
-			(void) result;
+	result = (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
+	assert(SL_RESULT_SUCCESS == result);
+	(void) result;
 }
-//static void NativeSlave::playCallBack(SLAndroidSimpleBufferQueueItf bq,
-//		void *context) {
-//	assert(bq == bqPlayerBufferQueue);
-//	assert(NULL != context);
-//	NativeSlave *mSlave=(NativeSlave *)context;
-//	while (mBuffer->getReadSpace() < 8192 * 2);
-//	mSlave->enqueueBuffer();
-//}
 
 bool NativeSlave::createAudioPlayer(NativeSlave *mSlave) {
 	SLresult result;
@@ -112,12 +105,12 @@ bool NativeSlave::createAudioPlayer(NativeSlave *mSlave) {
 	SLDataSink audioSnk = { &loc_outmix, NULL };
 
 	// create audio player
-	const SLInterfaceID ids[3] = { SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND,
-			SL_IID_VOLUME };
-	const SLboolean req[3] =
-			{ SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+	const SLInterfaceID ids[4] = { SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND,
+			SL_IID_VOLUME, SL_IID_PLAYBACKRATE };
+	const SLboolean req[4] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+	SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 	result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject,
-			&audioSrc, &audioSnk, 3, ids, req);
+			&audioSrc, &audioSnk, 4, ids, req);
 	assert(SL_RESULT_SUCCESS == result);
 	(void) result;
 
@@ -144,6 +137,11 @@ bool NativeSlave::createAudioPlayer(NativeSlave *mSlave) {
 	assert(SL_RESULT_SUCCESS == result);
 	(void) result;
 
+	//get playback rate interface
+	result = (*bqPlayerObject)->GetInterface(bqPlayerObject,
+			SL_IID_PLAYBACKRATE, &PlaybackRate);
+	assert(SL_RESULT_SUCCESS == result);
+	(void) result;
 	// get the effect send interface
 	result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_EFFECTSEND,
 			&bqPlayerEffectSend);
@@ -161,7 +159,6 @@ bool NativeSlave::createAudioPlayer(NativeSlave *mSlave) {
 	assert(SL_RESULT_SUCCESS == result);
 	(void) result;
 	//pthread_t id;
-
 	ALOGD("pzhao-->createAudioPlayer finish");
 	return 0;
 }
@@ -180,17 +177,38 @@ void NativeSlave::setPlayAudioPlayer(bool isPlay) {
 				isPlay ? SL_PLAYSTATE_PLAYING : SL_PLAYSTATE_PAUSED);
 		assert(SL_RESULT_SUCCESS == result);
 	}
-	if(!isPlay) {
+	if (!isPlay) {
 		clearQueueBuffer();
 		mBuffer->Reset();
 	}
 }
 
 void NativeSlave::setMuteUriAudioPlayer(bool isMute) {
+	SLmillibel min = SL_MILLIBEL_MIN;
+	SLmillibel max = SL_MILLIBEL_MIN;
+	(*bqPlayerVolume)->GetMaxVolumeLevel(bqPlayerVolume, &max);
+	ALOGD("pzhao-->max=%d,min=%d", max, min);
 	SLresult result;
 	if (NULL != bqPlayerVolume) {
 		result = (*bqPlayerVolume)->SetMute(bqPlayerVolume, isMute);
 		assert(SL_RESULT_SUCCESS == result);
 	}
-
+	//setPlaybackRate(1050);
 }
+
+void NativeSlave::setPlaybackRate(int rate) {
+	/*
+	SLpermille minRate, maxRate, stepSize;
+	SLuint32 capa;
+	(*PlaybackRate)->GetRateRange(PlaybackRate, 0, &minRate, &maxRate, &stepSize, &capa);
+	SLpermille mRate;
+	(*PlaybackRate)->GetRate(PlaybackRate, &mRate);
+	ALOGD("pzhao-->minRate=%d,maxRate=%d,stepSize=%d,capa=%d,getRate=%d", minRate,maxRate,stepSize,capa,mRate);
+	*/
+	if (NULL != PlaybackRate) {
+		SLresult result;
+		result = (*PlaybackRate)->SetRate(PlaybackRate, rate);
+		assert(SL_RESULT_SUCCESS == result);
+	}
+}
+

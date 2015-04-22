@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class WriteThread extends Thread{
     public MainActivity mActivity;
-    public String URI_PCM = "/storage/emulated/0/DCIM/ye.wav";  
+    public String URI_PCM = "/storage/emulated/0/DCIM/hou.wav";  
     public BufferedInputStream bis;
     public boolean isRuning=true;
     public boolean startFlag=false;

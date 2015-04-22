@@ -29,6 +29,7 @@ private :
 	SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
 	SLEffectSendItf bqPlayerEffectSend;
 	SLVolumeItf bqPlayerVolume;
+	SLPlaybackRateItf PlaybackRate;
 	SLVolumeItf uriPlayerVolume;
 	SLSeekItf uriPlayerSeek;
 	SLMuteSoloItf uriPlayerMuteSolo;
@@ -53,7 +54,7 @@ public :
 	void startPlay();
 	void setPlayAudioPlayer(bool isPlay);
 	void setMuteUriAudioPlayer(bool isMute);
-
+	void setPlaybackRate(int rate);
 };
 
 
