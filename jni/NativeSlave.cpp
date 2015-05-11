@@ -5,7 +5,10 @@
 
 NativeSlave::NativeSlave(size_t size) {
 	mBuffer = new RingBuffer(size);
-	nextBuffer = (char*) malloc(8192);
+	nextBuffer = (char*) malloc(480);
+	allzeroBuf=(char*) malloc(480);
+	pause=true;
+	memset(allzeroBuf,0,480);
 	ALOGD("pzhao-->NativeSlave created");
 }
 
@@ -34,6 +37,8 @@ NativeSlave::~NativeSlave() {
 		delete mBuffer;
 	if (nextBuffer != NULL)
 		free(nextBuffer);
+	if (allzeroBuf != NULL)
+			free(allzeroBuf);
 
 	ALOGD("pzhao-->delete NativeSlave");
 }
@@ -69,9 +74,17 @@ void NativeSlave::createEngine() {
 }
 
 void NativeSlave::enqueueBuffer() {
-	while (mBuffer->getReadSpace() < 8192 * 2)
-		;
-	int nextSize = mBuffer->Read(nextBuffer, 8192);
+	int nextSize ;
+	if(pause){
+		memcpy(nextBuffer,allzeroBuf,480);
+		nextSize=480;
+	}
+	else{
+		while (mBuffer->getReadSpace() < 480)
+			;
+		nextSize = mBuffer->Read(nextBuffer, 480);
+	}
+
 	if (nextSize > 0) {
 		SLresult result;
 		result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue,
@@ -177,8 +190,9 @@ void NativeSlave::setPlayAudioPlayer(bool isPlay) {
 				isPlay ? SL_PLAYSTATE_PLAYING : SL_PLAYSTATE_PAUSED);
 		assert(SL_RESULT_SUCCESS == result);
 	}
-	if (!isPlay) {
-		clearQueueBuffer();
+	if (pause) {
+	//	clearQueueBuffer();
+		usleep(30000);
 		mBuffer->Reset();
 	}
 }

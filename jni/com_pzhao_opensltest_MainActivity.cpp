@@ -2,7 +2,7 @@
 #define DGB 1
 #include <jni.h>
 #include <pthread.h>
-#include <unistd.h>
+
 #include "log.h"
 
 #include "com_pzhao_opensltest_MainActivity.h"
@@ -53,7 +53,7 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setJniEnv(
 
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine(
 		JNIEnv *env, jclass clazz, jobject jbuffer) {
-	mSlave = new NativeSlave(1024 * 1024);
+	mSlave = new NativeSlave(92160);
 	buffer = env->GetDirectBufferAddress(jbuffer);
 	bufferSize = env->GetDirectBufferCapacity(jbuffer);
 	firstFlag = true;
@@ -64,12 +64,16 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_createEngine(
 JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_createAudioPlayer(
 		JNIEnv *env, jclass clazz) {
 	mSlave->createAudioPlayer(mSlave);
+	mSlave->startPlay();
 }
 
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setPlayingUriAudioPlayer(
 		JNIEnv *env, jclass clazz, jboolean isPlaying) {
 	if(isPlaying)firstFlag=true;
-	mSlave->setPlayAudioPlayer(isPlaying);
+	else{
+		mSlave->pause=true;
+	}
+	mSlave->setPlayAudioPlayer(true);
 }
 
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setMuteUriAudioPlayer(
@@ -79,17 +83,17 @@ JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_setMuteUriAudioPla
 
 JNIEXPORT jboolean JNICALL Java_com_pzhao_opensltest_MainActivity_checkWrite(
 		JNIEnv *env, jclass clazz) {
-	return mSlave->mBuffer->getWriteSpace() >= 8192;
+	return mSlave->mBuffer->getWriteSpace() >= 480;
 }
 
 JNIEXPORT void JNICALL Java_com_pzhao_opensltest_MainActivity_write(JNIEnv *env,
 		jclass clazz) {
 	int hasW = mSlave->mBuffer->Write((char*) buffer, bufferSize);
-	if (firstFlag && mSlave->mBuffer->getReadSpace() >= 8192 * 2) {
+	if (firstFlag && mSlave->mBuffer->getReadSpace() >= 61440) {
 		firstFlag = false;
 		pthread_t pt;
 		pthread_create(&pt, NULL, sendStartUdp, NULL);
-		mSlave->startPlay();
+		mSlave->pause=false;
 	}
 }
 
